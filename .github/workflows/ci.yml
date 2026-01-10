@@ -1,0 +1,87 @@
+name: ci
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Basic sanity (compile)
+        run: python -m compileall -q .
+
+      - name: Ruff (lint + format check)
+        run: |
+          python -m ruff check .
+          python -m ruff format --check .
+
+      - name: Pytest
+        run: python -m pytest -q
+
+      - name: Docker present?
+        id: dockerfile
+        shell: bash
+        run: |
+          if [ -f Dockerfile ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Set Docker image name (lowercase)
+        if: steps.dockerfile.outputs.present == 'true'
+        shell: bash
+        run: echo "IMAGE_NAME=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        if: steps.dockerfile.outputs.present == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker test (build test stage)
+        if: steps.dockerfile.outputs.present == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: test
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Docker build (runtime)
+        if: steps.dockerfile.outputs.present == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runtime
+          tags: ${{ env.IMAGE_NAME }}:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

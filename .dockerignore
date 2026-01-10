@@ -1,0 +1,48 @@
+# --- Python / caches ---
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# --- Coverage / test artifacts ---
+.coverage
+htmlcov/
+coverage.xml
+
+# --- Packaging / build artifacts ---
+dist/
+build/
+*.egg-info/
+
+# --- Git / IDE ---
+.git/
+.vscode/
+.idea/
+
+# --- Env / secrets ---
+.env
+.env.*
+.envrc
+.streamlit/secrets.toml
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Runtime artifacts (don’t bake into image) ---
+data/
+datasets/
+artifacts/
+models/
+outputs/
+runs/
+
+# --- Node (if any) ---
+node_modules/

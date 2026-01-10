@@ -1,0 +1,77 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyd
+*.egg-info/
+
+# Packaging / build
+dist/
+build/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+.venv.bak/
+venv.bak/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pytype/
+.pyre/
+
+# =========================
+# Tests / coverage
+# =========================
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+*.cover
+*.py,cover
+
+# =========================
+# Jupyter / notebooks
+# =========================
+.ipynb_checkpoints/
+*.ipynb~
+
+# =========================
+# Streamlit (keep config, ignore secrets)
+# =========================
+.streamlit/secrets.toml
+
+# Logs
+*.log
+logs/
+
+# Local databases (optional but common)
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# OS / IDE
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iml
+.history/
+
+# =========================
+# Git
+# =========================
+*.orig

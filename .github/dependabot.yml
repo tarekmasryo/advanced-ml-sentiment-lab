@@ -1,0 +1,48 @@
+version: 2
+
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Africa/Cairo"
+    open-pull-requests-limit: 2
+    rebase-strategy: "auto"
+    labels: ["dependencies", "python"]
+    groups:
+      python-patch-minor:
+        patterns: ["*"]
+        update-types: ["patch", "minor"]
+      python-major:
+        patterns: ["*"]
+        update-types: ["major"]
+    # Optional safety: keep major updates manual for heavy deps
+    # ignore:
+    #   - dependency-name: "numpy"
+    #     update-types: ["version-update:semver-major"]
+    #   - dependency-name: "pandas"
+    #     update-types: ["version-update:semver-major"]
+    #   - dependency-name: "scikit-learn"
+    #     update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Africa/Cairo"
+    open-pull-requests-limit: 2
+    rebase-strategy: "auto"
+    labels: ["dependencies", "github-actions"]
+    groups:
+      actions-patch-minor:
+        patterns: ["*"]
+        update-types: ["patch", "minor"]
+      actions-major:
+        patterns: ["*"]
+        update-types: ["major"]
