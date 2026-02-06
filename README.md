@@ -24,14 +24,12 @@ It will:
 - Tune the **decision threshold** with **FP/FN business cost**
 - Explore **misclassifications** and run **live predictions** on arbitrary text
 
-Works great with **IMDB 50K Reviews**:
+Works great with **IMDB 50K Reviews**:  
 https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
 
 ---
 
 ## Dashboard Preview
-
-> If you do not have these images, either add them to `assets/` or remove this section.
 
 ### EDA & KPIs
 ![EDA](assets/eda-hero.png)
@@ -94,10 +92,13 @@ git clone https://github.com/tarekmasryo/advanced-ml-sentiment-lab.git
 cd advanced-ml-sentiment-lab
 
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
+
+# Windows PowerShell:
+#   .\.venv\Scripts\Activate.ps1
+# Windows CMD:
+#   .\.venv\Scripts\activate.bat
 # macOS/Linux:
-# source .venv/bin/activate
+#   source .venv/bin/activate
 
 python -m pip install -U pip
 pip install -r requirements.txt
