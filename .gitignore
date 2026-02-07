@@ -52,6 +52,16 @@ htmlcov/
 # =========================
 .streamlit/secrets.toml
 
+# =========================
+# Runtime artifacts (generated)
+# =========================
+artifacts/
+models/
+outputs/
+runs/
+data/
+datasets/
+
 # Logs
 *.log
 logs/

@@ -395,6 +395,27 @@ def _safe_read_csv(path: Path) -> pd.DataFrame | None:
     return None
 
 
+def _read_uploaded_csv(uploaded) -> pd.DataFrame | None:
+    """Read an uploaded CSV (Streamlit UploadedFile) with a couple of safe fallbacks."""
+    read_errors = (UnicodeDecodeError, ValueError, pd.errors.ParserError)
+    try:
+        return pd.read_csv(uploaded)
+    except read_errors as e:
+        logger.debug("read_csv failed for uploaded file (default): %s", e)
+
+    try:
+        uploaded.seek(0)
+    except Exception:
+        pass
+
+    try:
+        return pd.read_csv(uploaded, encoding_errors="ignore")
+    except read_errors as e:
+        logger.debug("read_csv failed for uploaded file (encoding_errors=ignore): %s", e)
+
+    return None
+
+
 # -----------------------------------------------------------------------------
 # Data loading / cleaning
 # -----------------------------------------------------------------------------
@@ -621,7 +642,12 @@ def main() -> None:
     )
 
     if uploaded is not None:
-        df = pd.read_csv(uploaded)
+        df = _read_uploaded_csv(uploaded)
+        if df is None:
+            st.error(
+                "Failed to read the uploaded CSV. Try exporting as UTF-8 or a simpler delimiter."
+            )
+            st.stop()
     else:
         df = load_csv_auto()
 
@@ -707,6 +733,16 @@ def main() -> None:
         pos_label_str=pos_label_str,
         neg_label_str=neg_label_str,
     )
+
+    # Stratified splits need enough samples per class.
+    n_pos_total = int((y == 1).sum())
+    n_neg_total = int((y == 0).sum())
+    if min(n_pos_total, n_neg_total) < 2:
+        st.error(
+            f"Not enough samples per class for stratified training. "
+            f"Found: {n_pos_total:,} positive vs {n_neg_total:,} negative."
+        )
+        st.stop()
 
     if len(dfc) < 100:
         st.error("Not enough rows after filtering to the selected labels.")
@@ -974,12 +1010,20 @@ def main() -> None:
                 indices = np.arange(n_total)
 
                 if train_rows < n_total:
-                    sample_idx, _ = train_test_split(
-                        indices,
-                        train_size=train_rows,
-                        stratify=y,
-                        random_state=random_state,
-                    )
+                    try:
+                        sample_idx, _ = train_test_split(
+                            indices,
+                            train_size=train_rows,
+                            stratify=y,
+                            random_state=random_state,
+                        )
+                    except ValueError as e:
+                        st.error(
+                            "Stratified sampling failed. Your dataset may be too imbalanced for the chosen subset size. "
+                            "Try increasing `Max rows used for training` or use a more balanced dataset."
+                        )
+                        st.exception(e)
+                        st.stop()
                 else:
                     sample_idx = indices
 
@@ -1001,13 +1045,29 @@ def main() -> None:
                 progress.progress(40)
 
                 local_idx = np.arange(len(df_train))
-                train_loc, val_loc, y_train, y_val = train_test_split(
-                    local_idx,
-                    y_sample,
-                    test_size=test_size,
-                    stratify=y_sample,
-                    random_state=random_state,
-                )
+                min_class = int(min((y_sample == 0).sum(), (y_sample == 1).sum()))
+                if min_class < 2:
+                    st.error(
+                        f"Not enough samples per class for a stratified split (min class count={min_class}). "
+                        "Add more data, or check your label mapping."
+                    )
+                    st.stop()
+
+                try:
+                    train_loc, val_loc, y_train, y_val = train_test_split(
+                        local_idx,
+                        y_sample,
+                        test_size=test_size,
+                        stratify=y_sample,
+                        random_state=random_state,
+                    )
+                except ValueError as e:
+                    st.error(
+                        "Stratified train/validation split failed. Try lowering `Validation split (%)` "
+                        "or increasing your dataset size."
+                    )
+                    st.exception(e)
+                    st.stop()
                 X_train = X_all[train_loc]
                 X_val = X_all[val_loc]
 

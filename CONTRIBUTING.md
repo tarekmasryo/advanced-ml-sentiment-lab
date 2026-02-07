@@ -19,3 +19,6 @@ python -m ruff check .
 python -m ruff format --check .
 python -m pytest -q
 python -m streamlit run app.py
+```
+
+Tip: run `python scripts/doctor.py --check` for a quick environment + CI-like check.
