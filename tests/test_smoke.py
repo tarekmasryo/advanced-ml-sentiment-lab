@@ -1,6 +1,9 @@
 import importlib
+import importlib.util
 import os
 import sys
+
+import pytest
 
 
 def _parse_version(v: str) -> tuple[int, int]:
@@ -16,29 +19,16 @@ def test_smoke_python_version():
 
 
 def test_smoke_core_imports():
-    """
-    Fast fail if core dependencies are broken.
-
-    Configure via:
-      SMOKE_IMPORTS="numpy,pandas,sklearn,streamlit,plotly"
-    """
-    imports = os.getenv("SMOKE_IMPORTS", "")
-    if not imports.strip():
-        return
+    """Fast fail if core runtime dependencies are broken."""
+    imports = os.getenv("SMOKE_IMPORTS", "numpy,pandas,sklearn")
 
     for mod in [m.strip() for m in imports.split(",") if m.strip()]:
         importlib.import_module(mod)
 
 
 def test_smoke_project_module_importable():
-    """
-    Ensure the main project module imports.
-    Configure via:
-      PROJECT_MODULE="your_package_name"
-    """
-    module = os.getenv("PROJECT_MODULE", "").strip()
-    if not module:
-        return
+    """Ensure the project package imports without optional environment flags."""
+    module = os.getenv("PROJECT_MODULE", "sentiment_lab").strip()
     importlib.import_module(module)
 
 
@@ -48,5 +38,7 @@ def test_smoke_app_importable():
     Override via:
       APP_MODULE="app"  (default)
     """
+    if importlib.util.find_spec("streamlit") is None:
+        pytest.skip("streamlit is not installed in this environment")
     app_module = os.getenv("APP_MODULE", "app").strip()
     importlib.import_module(app_module)

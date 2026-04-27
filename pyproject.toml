@@ -1,3 +1,37 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "advanced-ml-sentiment-lab"
+version = "1.0.0"
+description = "A decision-ready sentiment analysis dashboard with leakage-safe training, threshold tuning, and exportable artifacts."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Tarek Masryo" }]
+dependencies = [
+  "streamlit==1.51.0",
+  "pandas==2.3.3",
+  "numpy==2.3.5",
+  "scikit-learn==1.7.2",
+  "scipy==1.16.3",
+  "plotly==6.5.1",
+  "joblib==1.4.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff==0.14.10",
+  "pytest==8.3.4",
+  "pre-commit==4.5.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sentiment_lab", "sentiment_lab.*"]
+exclude = ["assets*", "tests*", "scripts*"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
@@ -23,11 +57,11 @@ select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = []
+known-first-party = ["sentiment_lab"]
 combine-as-imports = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**.py" = ["S101"]  # allow assert in tests (safe)
+"tests/**.py" = ["S101"]
 
 [tool.ruff.format]
 quote-style = "double"

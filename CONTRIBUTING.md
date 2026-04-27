@@ -1,19 +1,18 @@
 # Contributing
 
-This is a portfolio project. Issues and suggestions are welcome.
+This repository is maintained as a focused ML application. Small, targeted contributions are preferred.
 
-## Ways to contribute
-- Report bugs (include steps to reproduce and logs).
-- Suggest improvements (UX, performance, reliability).
-- Propose small PRs (docs, tests, refactors).
-- Security issues: please avoid posting sensitive details publicly.
+## Useful contributions
 
-## Dev setup
+- Bug reports with reproduction steps.
+- Test improvements.
+- Documentation fixes.
+- Small refactors that preserve behavior.
+- UX improvements that reduce friction without adding visual noise.
 
-From the repo root (inside a virtual environment):
+## Development
 
-```bash
-python -m pip install -r requirements.txt
+```powershell
 python -m pip install -r requirements-dev.txt
 python -m ruff check .
 python -m ruff format --check .
@@ -21,4 +20,8 @@ python -m pytest -q
 python -m streamlit run app.py
 ```
 
-Tip: run `python scripts/doctor.py --check` for a quick environment + CI-like check.
+For a quick local check, run:
+
+```powershell
+python scripts/doctor.py --check
+```

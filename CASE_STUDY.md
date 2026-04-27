@@ -1,33 +1,65 @@
 # Case Study — Advanced ML Sentiment Lab
 
 ## Problem
-Binary sentiment projects often stall at “a notebook that works” without a clear way to compare models, tune thresholds, or inspect mistakes. The goal was a single interactive lab that answers practical questions fast:
 
-- Which classical model performs best on *my* dataset (ROC/PR AUC, F1, Precision/Recall)?
-- What decision threshold should we use when FP/FN costs aren’t equal?
-- What are the most common failure cases (false positives/negatives), and why?
+Many sentiment-classification examples stop at a single validation score. That is not enough for a reviewer, stakeholder, or engineering team deciding whether a model is reliable enough to use.
 
-## Approach
-- Streamlit + Plotly dashboard for EDA → training → evaluation → error analysis → live prediction.
-- Feature engineering with **TF‑IDF word n‑grams (1–3)** + optional **char n‑grams (3–6)**.
-- Train/compare classical baselines: **LogReg / RandomForest / GradientBoosting / Multinomial Naive Bayes**.
-- Save trained artifacts for reuse under `artifacts/sentiment_lab/`.
+A useful review workflow should answer:
 
-## Key Decisions
-- **Flexible input:** upload any CSV, map text/label columns, and choose which label value is positive.
-- **Fast iteration:** stratified train/val split on a capped subset to keep the UI responsive.
-- **Cost-aware thresholding:** visualize metric tradeoffs and choose threshold using FP/FN business costs.
-- **Error-first debugging:** browse FP/FN, sorted by confidence, to quickly spot patterns.
+- Is the dataset clean enough to train on?
+- Was preprocessing fitted without leakage?
+- Which model is the strongest baseline?
+- Which threshold should drive the final decision?
+- What mistakes are most costly?
+- Can the result be exported with enough evidence for review?
 
-## Results
-A decision-friendly sentiment lab that supports:
-- EDA (class balance, text length/token stats)
-- Model comparison + ROC/PR curves + confusion matrices
-- Threshold tuning (F1 vs threshold, cost vs threshold)
-- Error analysis (FP/FN explorer)
-- Interactive prediction on arbitrary text + persisted artifacts
+## Solution
 
-## Next Steps
-- Add CV + calibration (Platt/Isotonic) for better probability quality.
-- Add simple explainability (top TF‑IDF features / n‑grams per class).
-- Add exportable “model report” (HTML/PDF) + run history under `runs/`.
+Advanced ML Sentiment Lab packages the sentiment workflow into a Streamlit application with a single guided path:
+
+```text
+Upload or detect data -> review quality -> train models -> evaluate thresholds -> inspect mistakes -> test predictions -> export evidence
+```
+
+## Engineering decisions
+
+### Leakage-safe training
+
+TF-IDF vectorizers are fitted only on training text. Validation and test partitions are transformed with the fitted vectorizers.
+
+### Duplicate-aware data policy
+
+Exact duplicate cleaned texts can be removed before splitting. This reduces the chance that repeated reviews appear in both training and evaluation partitions.
+
+### Decision-oriented evaluation
+
+The app reports more than accuracy. It includes F1, ROC-AUC, PR-AUC, Brier score, threshold recommendations, expected FP/FN cost, confusion matrices, and error review.
+
+### Threshold-aware prediction
+
+The Prediction Lab uses the selected or recommended threshold. It does not silently fall back to a fixed 0.5 cutoff.
+
+### Exportable evidence
+
+Each run can produce an HTML report, model card, metrics CSV, threshold recommendations, metadata, and a review bundle.
+
+## Current scope
+
+The project is a practical ML review application focused on inspectable text-classification workflows, decision thresholds, and review-ready artifacts.
+
+Intentional constraints:
+
+- English-oriented preprocessing.
+- Binary text classification.
+- Classical ML baselines and challengers.
+- Local artifacts only.
+- Streamlit UI instead of a separate frontend/backend service.
+
+## Future extensions
+
+- Optional embedding or transformer challenger.
+- Batch scoring flow.
+- External validation dataset support.
+- Label-quality audit.
+- Drift and monitoring report.
+- FastAPI inference service.

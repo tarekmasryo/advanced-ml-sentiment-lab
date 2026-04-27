@@ -5,134 +5,256 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](LICENSE)
 [![Made by Tarek Masryo](https://img.shields.io/badge/Made%20by-Tarek%20Masryo-blue)](https://github.com/tarekmasryo)
 
-Interactive **Streamlit + Plotly** dashboard for **binary sentiment analysis** with training, evaluation, threshold tuning, error analysis, and live prediction.
+**Advanced ML Sentiment Lab** is a Streamlit and Plotly application for English IMDB-style sentiment analysis and binary text-classification review workflows.
+
+It turns a modeling workflow into a structured ML review lab: load data, validate quality, train leakage-safe models, tune decision thresholds, inspect mistakes, test predictions, and export review-ready artifacts.
 
 ---
 
-## Overview
+## ✨ Highlights
 
-Give it any CSV with:
-
-- **Text column** (e.g., `review`, `text`, `comment`)
-- **Binary label column** (e.g., `sentiment`, `label`)
-
-It will:
-
-- Clean text and build **TF-IDF word n-grams** + optional **character n-grams**
-- Train classical models (Logistic Regression, Random Forest, Gradient Boosting, Naive Bayes)
-- Evaluate with **ROC-AUC, PR-AUC, F1, Accuracy, Precision, Recall**
-- Tune the **decision threshold** with **FP/FN business cost**
-- Explore **misclassifications** and run **live predictions** on arbitrary text
-
-Works great with **IMDB 50K Reviews**:  
-https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
-
----
-
-## Dashboard Preview
-
-### EDA & KPIs
-![EDA](assets/eda-hero.png)
-
-### Train & Validation
-![Train & Validation](assets/train-validation.png)
-
-### Error Analysis
-![Error Analysis](assets/error-analysis.png)
-
-### Deploy & Interactive Prediction
-![Deploy](assets/deploy.png)
+- Single fixed workflow with sidebar navigation.
+- Automatic text and label column detection with manual override.
+- English-oriented preprocessing for IMDB-style review datasets.
+- Duplicate-aware data policy before train/validation/test splitting.
+- Leakage-safe TF-IDF fitting on training text only.
+- TF-IDF word n-grams with optional character n-grams.
+- Classical ML baselines and challengers, including linear models, Naive Bayes, and tree-based models.
+- Optional calibration for supported models.
+- Validation-based threshold tuning with FP/FN cost controls.
+- Optional held-out test estimate.
+- Error review for confident false positives and false negatives.
+- Linear-model explainability for supported estimators.
+- Threshold-aware live prediction instead of a fixed `0.5` cutoff.
+- HTML report, model card, metrics CSVs, metadata, and review bundle export.
+- Local artifact manifest hashing before automatic artifact reload.
 
 ---
 
-## Key Features
+## 🧭 Workflow
 
-### Flexible input
-- Upload your own CSV from the sidebar
-- Auto-load common filenames if present in the repo:
-  - `IMDB Dataset.csv`
-  - `imdb.csv`
-  - `reviews.csv`
-  - `data.csv`
-  - `comments.csv`
-- Map text/label columns and choose which label value is **positive** vs **negative**
-
-### Multi-model training
-- TF-IDF word n-grams (1–3) + optional char n-grams (3–6)
-- Configurable max features and validation split
-- Logistic Regression, Random Forest, Gradient Boosting, Multinomial Naive Bayes
-
-### Evaluation & comparison
-- Stratified train/validation split on a capped subset for fast iteration
-- Model cards + ROC/PR curves + confusion matrices
-
-### Threshold & business cost
-- Move threshold and see how metrics change
-- Attach FP/FN costs and visualize **F1 vs threshold** and **cost vs threshold**
-
-### Error analysis
-- Browse false positives / false negatives
-- Sort by most confident errors or least confident predictions
-
-### Artifacts
-Trained artifacts are saved under:
-
-- `artifacts/sentiment_lab/`
-  - `models.joblib`
-  - `vectorizers.joblib`
-  - `results.joblib`
-  - `metadata.joblib`
-
----
-
-## Run Locally
-
-```bash
-git clone https://github.com/tarekmasryo/advanced-ml-sentiment-lab.git
-cd advanced-ml-sentiment-lab
-
-python -m venv .venv
-
-# Windows PowerShell:
-#   .\.venv\Scripts\Activate.ps1
-# Windows CMD:
-#   .\.venv\Scripts\activate.bat
-# macOS/Linux:
-#   source .venv/bin/activate
-
-python -m pip install -U pip
-pip install -r requirements.txt
-
-streamlit run app.py
+```text
+Overview
+→ Data Setup
+→ Training
+→ Evaluation
+→ Prediction Lab
+→ Export
+→ Run History
 ```
 
-Place your dataset next to `app.py`, inside `data/`, or upload it from the sidebar.
+| Stage | Purpose |
+|---|---|
+| **Overview** | Review dataset status, detected columns, training state, and the next recommended action. |
+| **Data Setup** | Inspect class balance, duplicate policy, empty text, short text, and quality warnings before modeling. |
+| **Training** | Train leakage-safe models with configurable TF-IDF features, calibration, validation split, held-out test split, and runtime parallelism. |
+| **Evaluation** | Compare models, review threshold recommendations, inspect metrics, confusion matrices, confident mistakes, and explanations. |
+| **Prediction Lab** | Score new text using the selected model and the recommended decision threshold. |
+| **Export** | Download reports, summaries, metadata, CSV outputs, and a stakeholder review bundle. |
+| **Run History** | Browse recent local training runs saved under the configured artifacts directory. |
 
 ---
 
-## Run with Docker
+## 📄 Dataset format
+
+The app expects a CSV with:
+
+- A **text column**, such as `review`, `text`, or `comment`.
+- A **binary label column**, such as `sentiment`, `label`, or `target`.
+
+The positive and negative label values can be auto-detected for common datasets or selected manually in the app.
+
+This project works well with the [IMDB 50K Reviews dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews).
+
+### Supported local filenames
+
+If no file is uploaded from the sidebar, the app checks common local filenames such as:
+
+```text
+IMDB Dataset.csv
+imdb.csv
+reviews.csv
+data.csv
+comments.csv
+```
+
+Place the dataset next to `app.py`, put it inside `data/`, or upload it directly from the app sidebar.
+
+---
+
+## 🤖 Model families
+
+The lab focuses on strong, interpretable classical ML baselines for text classification:
+
+- Logistic Regression.
+- Linear SVM / SGD-style linear classifiers where supported.
+- Multinomial Naive Bayes.
+- Random Forest.
+- Gradient Boosting or other tree-based challengers.
+
+The goal is not to replace transformer-based NLP systems. The goal is to provide a fast, inspectable, leakage-safe baseline workflow with threshold tuning and review-ready exports.
+
+---
+
+## 🖼️ Dashboard Preview
+
+### Overview
+
+![Overview](assets/overview.png)
+
+### Exploratory Data Analysis
+
+![Exploratory Data Analysis](assets/exploratory-data-analysis.png)
+
+### Evaluation
+
+![Evaluation](assets/evaluation.png)
+
+---
+
+## 🧱 Project structure
+
+```text
+app.py
+sentiment_lab/
+  app/
+    main.py
+    navigation.py
+    components.py
+    runtime.py
+  artifacts.py
+  data_quality.py
+  decision.py
+  evaluation.py
+  explainability.py
+  features.py
+  io.py
+  prediction.py
+  preprocessing.py
+  reporting.py
+  runtime_config.py
+  stability.py
+  thresholding.py
+  training.py
+  ui_theme.py
+  ux.py
+tests/
+assets/
+```
+
+`app.py` is intentionally small. The reusable ML, reporting, prediction, and runtime logic lives inside `sentiment_lab`, so it can be tested independently from the Streamlit entrypoint.
+
+---
+
+## ⚙️ Local setup
+
+Use **Python 3.11**.
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```powershell
+python -m pip install -r requirements-dev.txt
+```
+
+Run the app:
+
+```powershell
+python -m streamlit run app.py
+```
+
+---
+
+## ✅ Quality checks
+
+```powershell
+python -m ruff check .
+python -m ruff format --check .
+python -m pytest -q
+```
+
+Optional pre-commit check:
+
+```powershell
+pre-commit run -a
+```
+
+---
+
+## 🐳 Docker
+
+Build the runtime image:
 
 ```bash
 docker build --target runtime -t advanced-ml-sentiment-lab:runtime .
+```
+
+Run the app:
+
+```bash
 docker run --rm -p 8501:8501 advanced-ml-sentiment-lab:runtime
 ```
 
 Open:
-- http://localhost:8501
 
----
-
-## Development (Lint + Tests)
-
-```bash
-pip install -r requirements-dev.txt
-pre-commit install
-pre-commit run -a
-pytest -q
+```text
+http://localhost:8501
 ```
 
 ---
 
-## License
+## 🔧 Runtime configuration
 
-Apache License 2.0. See `LICENSE`.
+| Variable | Default | Purpose |
+|---|---:|---|
+| `ARTIFACTS_DIR` | `./artifacts` | Local output directory for model artifacts and run history. |
+| `SENTIMENT_LAB_N_JOBS` | `1` | Default training parallelism for supported models. |
+| `HOST` | `0.0.0.0` | Docker host binding. |
+| `PORT` | `8501` | Streamlit port. |
+| `APP_FILE` | `app.py` | Streamlit entrypoint. |
+
+Use `SENTIMENT_LAB_N_JOBS=1` for stable local and CI behavior. Use higher values only when the machine can handle parallel training reliably.
+
+---
+
+## 🔐 Artifact safety
+
+The app uses `joblib` for local scikit-learn artifacts. Treat these files as trusted local outputs only.
+
+Do not load `.joblib` files from unknown users or external sources.
+
+Generated local artifacts include `artifact_manifest.json`, and the app verifies hashes before automatic reload.
+
+The stakeholder review bundle intentionally excludes `.joblib` model binaries. It contains reports, summaries, metadata, and CSV outputs for review.
+
+---
+
+## 📌 Evaluation scope
+
+The default preprocessing is intentionally English-oriented and tuned for IMDB-style review text.
+
+Internal validation and held-out test results are useful for development decisions, but real deployment requires:
+
+- recent representative data,
+- external validation,
+- monitoring,
+- drift checks,
+- security review,
+- operational ownership.
+
+---
+
+## 📄 License
+
+Apache License 2.0. See [LICENSE](LICENSE).

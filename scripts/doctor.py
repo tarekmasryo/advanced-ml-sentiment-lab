@@ -1,4 +1,3 @@
-# scripts/doctor.py
 from __future__ import annotations
 
 import os
@@ -46,7 +45,6 @@ def ok(msg: str) -> None:
 
 
 def parse_min_python() -> tuple[int, int]:
-    # Default policy for the kit; override via env if needed.
     v = os.getenv("MIN_PYTHON", "3.11").strip()
     parts = v.split(".")
     return int(parts[0]), int(parts[1])
@@ -72,10 +70,8 @@ def suggest_install() -> None:
     banner("Suggested setup commands")
     py = sys.executable
     if has_file("requirements-dev.txt"):
-        print(f"{py} -m pip install -U pip")
         print(f"{py} -m pip install -r requirements-dev.txt")
     elif has_file("requirements.txt"):
-        print(f"{py} -m pip install -U pip")
         print(f"{py} -m pip install -r requirements.txt")
         warn("requirements-dev.txt not found (dev tooling may be missing).")
     else:
@@ -85,7 +81,6 @@ def suggest_install() -> None:
 def check_tools() -> None:
     banner("Tooling")
     py = sys.executable
-    # Try importing these only if installed; don't crash the script.
     for mod in ["ruff", "pytest"]:
         code = run([py, "-c", f"import {mod}"])
         if code == 0:

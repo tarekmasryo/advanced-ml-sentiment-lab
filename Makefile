@@ -16,14 +16,12 @@ help:
 	@echo "  precommit    Install pre-commit hooks"
 
 install:
-	$(PY) -m pip install -U pip
 ifneq ($(wildcard requirements.txt),)
 	$(PY) -m pip install -r requirements.txt
 endif
 	@$(PY) -m pip check || true
 
 dev:
-	$(PY) -m pip install -U pip
 ifneq ($(wildcard requirements-dev.txt),)
 	$(PY) -m pip install -r requirements-dev.txt
 endif
@@ -49,5 +47,4 @@ check: lint
 	$(PY) -m pytest -q
 
 precommit:
-	$(PY) -m pip install -U pre-commit
 	pre-commit install
