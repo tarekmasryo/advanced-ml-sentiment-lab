@@ -736,9 +736,7 @@ def main() -> None:
                 progress.progress(5)
                 status.markdown("Sampling rows for training (stratified)…")
 
-                status.markdown(
-                    "Creating duplicate-safe train/validation/test split…"
-                )
+                status.markdown("Creating duplicate-safe train/validation/test split…")
                 progress.progress(20)
 
                 try:
