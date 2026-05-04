@@ -1327,7 +1327,9 @@ def main() -> None:
             decision_summary = metadata.get("decision_summary", {}) or {}
             recommended_name = str(decision_summary.get("recommended_model") or "")
 
-            deployment_options = ["Recommended model", "Best by validation F1"] + list(models.keys())
+            deployment_options = ["Recommended model", "Best by validation F1"] + list(
+                models.keys()
+            )
             model_choice = st.selectbox(
                 "Model for deployment",
                 options=deployment_options,
