@@ -862,17 +862,21 @@ def main() -> None:
                     all_results=all_results,
                     metadata=metadata,
                 )
-                best_for_report = max(
-                    all_results.keys(), key=lambda n: all_results[n]["metrics"]["f1"]
-                )
+                report_model_name = str(decision_summary.get("recommended_model") or "")
+                if report_model_name not in all_results:
+                    report_model_name = max(
+                        all_results.keys(), key=lambda n: all_results[n]["metrics"]["f1"]
+                    )
+
                 report_recommendations = recommend_thresholds(
                     y_val,
-                    all_results[best_for_report]["metrics"]["y_proba"],
+                    all_results[report_model_name]["metrics"]["y_proba"],
                     cost_fp=1.0,
                     cost_fn=5.0,
                     precision_target=0.90,
                     recall_target=0.90,
                 )
+                metadata["threshold_recommendation_model"] = report_model_name
 
                 leaderboard_df = build_model_leaderboard(all_results)
                 run_history_df = load_run_history(MODELS_DIR)
@@ -1306,7 +1310,7 @@ def main() -> None:
     if active_page == "Prediction Lab":
         render_section_header(
             "Deployment & interactive prediction",
-            "Pick the best model, test arbitrary texts, and reuse the same logic in an API or batch job.",
+            "Use the recommended model first, test arbitrary texts, and reuse the same logic in an API or batch job.",
         )
 
         state = STATE_STORE.load(MODELS_DIR)
@@ -1320,16 +1324,22 @@ def main() -> None:
             metadata = state["metadata"]
 
             best_name = max(all_results.keys(), key=lambda n: all_results[n]["metrics"]["f1"])
+            decision_summary = metadata.get("decision_summary", {}) or {}
+            recommended_name = str(decision_summary.get("recommended_model") or "")
 
+            deployment_options = ["Recommended model", "Best by validation F1"] + list(models.keys())
             model_choice = st.selectbox(
                 "Model for deployment",
-                options=["Best (by F1)"] + list(models.keys()),
+                options=deployment_options,
                 index=0,
             )
 
-            if model_choice == "Best (by F1)":
+            if model_choice == "Recommended model":
+                deploy_name = recommended_name if recommended_name in models else best_name
+                st.info(f"Using {deploy_name} based on the saved decision summary.")
+            elif model_choice == "Best by validation F1":
                 deploy_name = best_name
-                st.info(f"Using {best_name} (best F1 on validation).")
+                st.info(f"Using {best_name} based on validation F1.")
             else:
                 deploy_name = model_choice
 
