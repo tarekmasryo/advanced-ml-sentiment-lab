@@ -140,6 +140,17 @@ sentiment_lab/
   ux.py
 tests/
 assets/
+.github/workflows/
+  ci.yml
+Dockerfile
+pyproject.toml
+requirements.txt
+requirements-dev.txt
+README.md
+CASE_STUDY.md
+SECURITY.md
+CONTRIBUTING.md
+LICENSE
 ```
 
 `app.py` is intentionally small. The reusable ML, reporting, prediction, and runtime logic lives inside `sentiment_lab`, so it can be tested independently from the Streamlit entrypoint.
