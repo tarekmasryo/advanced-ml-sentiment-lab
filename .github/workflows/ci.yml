@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -64,11 +64,11 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.dockerfile.outputs.present == 'true'
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Docker test (build test stage)
         if: steps.dockerfile.outputs.present == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: test
@@ -78,7 +78,7 @@ jobs:
 
       - name: Docker build (runtime)
         if: steps.dockerfile.outputs.present == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: runtime
