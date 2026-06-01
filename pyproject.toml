@@ -12,7 +12,7 @@ license = { text = "Apache-2.0" }
 authors = [{ name = "Tarek Masryo" }]
 dependencies = [
   "streamlit==1.51.0",
-  "pandas==2.3.3",
+  "pandas==3.0.3",
   "numpy==2.3.5",
   "scikit-learn==1.7.2",
   "scipy==1.16.3",
@@ -23,7 +23,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "ruff==0.14.10",
-  "pytest==8.3.4",
+  "pytest==9.0.3",
   "pre-commit==4.5.1",
 ]
 
